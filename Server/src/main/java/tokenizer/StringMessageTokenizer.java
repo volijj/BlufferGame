@@ -1,4 +1,4 @@
-package tokenizer;
+package main.java.tokenizer;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;

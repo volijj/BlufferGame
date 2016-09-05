@@ -1,11 +1,11 @@
-package Databases;
+package main.java.Databases;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import Games.Game;
-import Interfaces.ProtocolCallback;
+import main.java.Games.Game;
+import main.java.Interfaces.ProtocolCallback;
 
 public class GameRoom {
 	// this class will hold all the relevant data of a game room.

@@ -1,8 +1,8 @@
-package protocols;
+package main.java.protocols;
 import java.io.*;
 import java.net.*;
 
-import Interfaces.ServerProtocolFactory;
+import main.java.Interfaces.ServerProtocolFactory;
 
 public class ThreadPerClientServer implements Runnable {
 	private ServerSocket serverSocket;
