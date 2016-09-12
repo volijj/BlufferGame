@@ -24,11 +24,11 @@ public class GameServerProtocol implements ServerProtocol<String> {
 		String ans = null;
 		boolean noNeed = false;
 		if(this.isEnd(msg)){ 
-			this._shouldClose=true;
 				TBGPData.getInstance().removePlayer(userNickname);
 				if(currentRoom!=null)
 					currentRoom.leaveRoom2(this.userNickname);
 				ans = "bye bye "+ userNickname;
+				return;
 			
 		}
 		String[] command = msg.split(" ");

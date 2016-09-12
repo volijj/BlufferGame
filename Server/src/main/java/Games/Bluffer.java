@@ -138,23 +138,9 @@ public class Bluffer extends Game {
 		DataObject o = null;
 
 		try {
-			BufferedReader obj = new BufferedReader(new FileReader(file)); // this
-																			// reads
-																			// the
-																			// json
-																			// file
-																			// and
-																			// makes
-																			// a
-																			// bufferedReader
-																			// the
-																			// gson
-																			// can
-																			// convert
-																			// to
-																			// a
-																			// java
-																			// object
+			BufferedReader obj = new BufferedReader(new FileReader(file)); // this reads the json file and makes a bufferedReader 
+																		   // the gson can convert to a java object.
+																		
 			o = gson.fromJson(obj, DataObject.class); // gson takes obj and
 														// makes a DataObject -
 														// look at that object I
@@ -233,5 +219,7 @@ public class Bluffer extends Game {
 	public int getCounter() {
 		return counter;
 	}
+
+	
 
 }
