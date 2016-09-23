@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 import main.java.Interfaces.ServerProtocol;
 
@@ -26,27 +27,31 @@ class ConnectionHandler implements Runnable {
 	private BufferedReader in;
 	private PrintWriter out;
 	Socket clientSocket;
-	GameServerProtocol protocol;
+	ServerProtocol protocol;
+	private static final Logger logger = Logger.getLogger("ConnectionHandler");
 
 	public ConnectionHandler(Socket acceptedSocket, ServerProtocol serverProtocol) {
+		
 		in = null;
 		out = null;
 		clientSocket = acceptedSocket;
-		protocol = (GameServerProtocol) serverProtocol;
-		System.out.println("Accepted connection from client!");
-		System.out.println("The client is from: " + acceptedSocket.getInetAddress() + ":" + acceptedSocket.getPort());
+		protocol = serverProtocol;
+		logger.info("Accepted connection from client!");
+		logger.info("The client is from: " + acceptedSocket.getInetAddress() + ":" + acceptedSocket.getPort());
+		try {
+			initialize();
+		} catch (IOException e) {
+			logger.info("Error in initializing I/O");
+			e.printStackTrace();
+		}
+		logger.info("I/O initialized");
+		out.println("Welcome to the GameServer!");
 	}
 
 	public void run() {
 
 		String msg;
-
-		try {
-			initialize();
-		} catch (IOException e) {
-			System.out.println("Error in initializing I/O");
-		}
-
+		
 		try {
 			process();
 		} catch (IOException e) {
@@ -68,7 +73,7 @@ class ConnectionHandler implements Runnable {
 				out.println(v);
 			});
 
-			if (protocol.shouldClose()) {
+			if (protocol.isEnd(msg)) {
 				break;
 			}
 
@@ -80,8 +85,7 @@ class ConnectionHandler implements Runnable {
 		// Initialize I/O
 		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
 		out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true);
-		System.out.println("I/O initialized");
-	}
+		}
 
 	// Closes the connection
 	public void close() {
@@ -105,6 +109,7 @@ class MultipleClientProtocolServer implements Runnable {
 	private ServerSocket serverSocket;
 	private int listenPort;
 	private ServerProtocolFactory factory;
+	private static final Logger logger = Logger.getLogger("MultipleClientProtocolServer");
 
 	public MultipleClientProtocolServer(int port, ServerProtocolFactory p) {
 		serverSocket = null;
@@ -115,9 +120,9 @@ class MultipleClientProtocolServer implements Runnable {
 	public void run() {
 		try {
 			serverSocket = new ServerSocket(listenPort);
-			System.out.println("Listening...");
+			logger.info("Listening...");
 		} catch (IOException e) {
-			System.out.println("Cannot listen on port " + listenPort);
+			logger.info("Cannot listen on port " + listenPort);
 		}
 
 		while (true) {
@@ -125,7 +130,8 @@ class MultipleClientProtocolServer implements Runnable {
 				ConnectionHandler newConnection = new ConnectionHandler(serverSocket.accept(), factory.create());
 				new Thread(newConnection).start();
 			} catch (IOException e) {
-				System.out.println("Failed to accept on port " + listenPort);
+				logger.info("Failed to accept on port " + listenPort);
+				e.printStackTrace();
 			}
 		}
 	}
