@@ -45,7 +45,7 @@ class ConnectionHandler implements Runnable {
 			e.printStackTrace();
 		}
 		logger.info("I/O initialized");
-		out.print("Welcome to the GameServer!");
+		out.println("Welcome to the GameServer!");
 	}
 
 	public void run() {
