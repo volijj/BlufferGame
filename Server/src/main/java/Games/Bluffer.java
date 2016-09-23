@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import main.java.Databases.GameRoom;
 import main.java.Interfaces.ProtocolCallback;
@@ -16,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class Bluffer extends Game {
+	
+	private static final Logger logger = Logger.getLogger("BlufferLogger");
 
 	ConcurrentHashMap<String, BlufferPlayer> players; // a map that maps names
 														// to blufferplayers.
@@ -54,18 +58,19 @@ public class Bluffer extends Game {
 	}
 
 	void SendQuestion() {
+		logger.info("SendQuestion called");
+		
 		if (counter < 3) {
 			Random r = new Random();
 			int i = r.nextInt(questions.size());
 			Question q = questions.remove(i);
 			String question = q.questionText;
 			this.currentRightAnswer = q.realAnswer;
-			fakeAnswers2 = new ArrayList<String>();
 			fakeAnswers = new ConcurrentHashMap<String, String>();
 			fakeAnswers.put(currentRightAnswer, "Rightans27771");
-			fakeAnswers2.add(currentRightAnswer);
-			for (String player : players.keySet()) {
-				players.get(player).sendQuestion("ASKTXT " + question);
+			
+			for (String playerName : players.keySet()) {
+				players.get(playerName).sendQuestion("ASKTXT " + question);
 
 			}
 			counter2 = 0;
@@ -79,14 +84,12 @@ public class Bluffer extends Game {
 		if (answer.equals(currentRightAnswer.toLowerCase()) || fakeAnswers2.contains(answer))
 			return "REJECTED";
 		fakeAnswers.put(answer, name);
-		fakeAnswers2.add(answer);
-		if (fakeAnswers2.size() == players.size() + 1) {
-
+		if (fakeAnswers.size() == players.size() + 1) {
 			String ans = OpenCards();
 
-			for (String nick : players.keySet()) {
+			for (String playerName : players.keySet()) {
 				try {
-					players.get(nick).callback.sendMessage("ASKCHOICES " + ans);
+					players.get(playerName).callback.sendMessage("ASKCHOICES " + ans);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -113,15 +116,17 @@ public class Bluffer extends Game {
 	}
 
 	private String OpenCards() {
-		String ans = shuffle(this.fakeAnswers2);
+		String ans = shuffle(new ArrayList(fakeAnswers.values()));
 		return ans;
 
 	}
 
-	private String shuffle(ArrayList<String> arr) {
+	private String shuffle(ArrayList arr) {
 		String ans = "";
 		int counter3 = 0;
 		Collections.shuffle(arr);
+		return arr.toString();
+		/*
 		while (counter3 < arr.size()) {
 			String check = arr.get(counter3);
 			if (check != null) {
@@ -129,7 +134,7 @@ public class Bluffer extends Game {
 				counter3++;
 			}
 		}
-		return ans;
+		return ans;*/
 	}
 
 	private DataObject readJson(String file) {
